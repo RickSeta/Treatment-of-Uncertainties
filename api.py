@@ -48,5 +48,9 @@ def arrival(losses, sent, duplicate, time_window=84600):
     return arrival
 
 print(arrival(loss_rate2, sent2, duplicate2))
-
-# 1711459620, 'val': 10.0}, {'ts': 1711460011, 'val': 10.0}, {'ts': 1711460375                  {'ts': 1711931837, 'val': 10.0}, {'ts': 1711932250, 'val': 10.0}, {'ts': 1711932367, 'val': 10.0}]
+#copiloto
+# def delay(rtt, time_window=84600):
+#     sum_rtt = 0
+#     for element in rtt:
+#         sum_rtt += element["val"]
+#     return sum_rtt/time_window
