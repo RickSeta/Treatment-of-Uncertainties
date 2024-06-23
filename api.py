@@ -38,11 +38,22 @@ def arrival(losses, sent, duplicate, time_window=84600):
     arrival = prob_arrival * (sum_sent-sum_duplicate)/time_window
     return arrival
 
-def service(rtt, time_window=84600):
+def waiting(rtt, time_window=84600):
     sum_rtt = 0
+
     for element in rtt:
-        sum_rtt += element["val"]
-    return sum_rtt/time_window
+        # O formato é quantidade de tempo(key) : quantos ocorreram durante aquele tempo
+        # (Por ser um histograma)
+        # logo, é necessário fazer uma média ponderada
+        sum_val = 0
+        val = element["val"]
+        sum_key = 0
+        for key in list(val.keys()):
+            sum_val += float(key) * val[key]
+            sum_key += val[key]
+        sum_rtt += sum_val/sum_key
+
+    return sum_rtt/len(rtt)
 
 sent2 = etapa2(sent, "packet-count-sent")
 
@@ -54,7 +65,14 @@ loss_rate2 = etapa2(loss_rate, "packet-loss-rate")
 
 arrival_rate = arrival(loss_rate2, sent2, duplicate2)
 
-service_rate = service(rtt2)
+waiting_time = waiting(rtt2)
+print(f'waiting_time: {waiting_time}')
+print(f'arrival: {arrival_rate}')
 
-utilizacao = arrival_rate/service_rate
-packet_number 
+utilizacao = arrival_rate * waiting_time
+# utilizacao = lambda*e[X]
+# packet_number = lambda*e[X]/ 1 - lambda*e[X]
+packet_number = utilizacao / (1- utilizacao)
+
+print(f'utilizacao: {utilizacao}')
+print(f'packet_number: {packet_number}')
