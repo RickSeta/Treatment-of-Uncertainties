@@ -51,9 +51,9 @@ def waiting(rtt):
 
     return sum_rtt/len(rtt)
 
-def plot_histograma_sub_rotina(min_hist, max_hist, histogram_data):
+def plot_histograma_sub_rotina(min_hist, max_hist, histogram_data, divisions):
 
-    bin_edges = np.arange(min_hist , max_hist,  np.floor((max_hist - min_hist) / 5))
+    bin_edges = np.arange(min_hist , max_hist,  np.floor((max_hist - min_hist) / divisions))
     bin_labels = [f"{bin_edges[i]:.1f} - {bin_edges[i+1]:.1f}" for i in range(len(bin_edges)-1)]
     binned_data = {label: 0 for label in bin_labels}
 
@@ -87,7 +87,7 @@ def plot_histograma(rtt):
     max_hist = max(histogram_data.keys()) - 1
     half_hist = max_hist / 2
 
-    plot_histograma_sub_rotina(min_hist, half_hist, histogram_data)
+    plot_histograma_sub_rotina(half_hist, max_hist, histogram_data, 7)
+    plot_histograma_sub_rotina(min_hist, half_hist, histogram_data, 7)
     
-    plot_histograma_sub_rotina(half_hist, max_hist, histogram_data)
  
