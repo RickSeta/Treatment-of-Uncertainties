@@ -38,7 +38,7 @@ def arrival(losses, sent, duplicate, time_window=84600):
     arrival = prob_arrival * (sum_sent-sum_duplicate)/time_window
     return arrival
 
-def waiting(rtt, time_window=84600):
+def waiting(rtt):
     sum_rtt = 0
 
     for element in rtt:
@@ -69,10 +69,13 @@ waiting_time = waiting(rtt2)
 print(f'waiting_time: {waiting_time}')
 print(f'arrival: {arrival_rate}')
 
-utilizacao = arrival_rate * waiting_time
+service_time = waiting_time/(1+arrival_rate * waiting_time)
+utilizacao = arrival_rate * service_time
 # utilizacao = lambda*e[X]
 # packet_number = lambda*e[X]/ 1 - lambda*e[X]
 packet_number = utilizacao / (1- utilizacao)
 
+print(f'service_time: {service_time}')
+print(f'service_rate: {1/service_time}')
 print(f'utilizacao: {utilizacao}')
 print(f'packet_number: {packet_number}')
