@@ -1,6 +1,7 @@
 
 
 from collections import defaultdict
+import random
 import numpy as np
 import requests
 import pandas as pd
@@ -51,9 +52,9 @@ def waiting(rtt):
 
     return sum_rtt/len(rtt)
 
-def plot_histograma_sub_rotina(min_hist, max_hist, histogram_data, divisions):
+def plot_histograma_sub_rotina(min_hist, max_hist, histogram_data, divisions, origin, destiny, plot, save):
 
-    bin_edges = np.arange(min_hist , max_hist,  np.floor((max_hist - min_hist) / divisions))
+    bin_edges = np.linspace(min_hist, max_hist, divisions + 1)
     bin_labels = [f"{bin_edges[i]:.1f} - {bin_edges[i+1]:.1f}" for i in range(len(bin_edges)-1)]
     binned_data = {label: 0 for label in bin_labels}
 
@@ -73,10 +74,12 @@ def plot_histograma_sub_rotina(min_hist, max_hist, histogram_data, divisions):
     plt.title('Histograma rtt')
     plt.xticks(rotation=45, ha='right')
     plt.grid(True)
-    plt.savefig('histograma_rtt_' + str(min_hist) + '.png')
-    plt.show()
+    if save:
+        plt.savefig(f'histograma_rtt_{origin}_{destiny}_{min_hist}.png')
+    if plot:
+        plt.show()
 
-def plot_histograma(rtt):
+def plot_histograma(rtt, origin, destiny, plot=True, save=False):
     histogram_data = defaultdict(int)
 
     for entry in rtt:
@@ -87,7 +90,36 @@ def plot_histograma(rtt):
     max_hist = max(histogram_data.keys()) - 1
     half_hist = max_hist / 2
 
-    plot_histograma_sub_rotina(half_hist, max_hist, histogram_data, 7)
-    plot_histograma_sub_rotina(min_hist, half_hist, histogram_data, 7)
-    
+    plot_histograma_sub_rotina(half_hist, max_hist, histogram_data, 7, origin, destiny, plot, save)
+    plot_histograma_sub_rotina(min_hist, half_hist, histogram_data, 7, origin, destiny, plot, save)
+
+def states_2by2():
+
+    estados = ['ac', 'al', 'ap', 'am', 'ba', 'ce', 'df', 'es', 'go', 'ma', 'mt', 'ms', 'mg', 'pa', 'pb', 'pr', 'pe', 'pi', 'rj', 'rn', 'rs', 'ro', 'rr', 'sc', 'sp', 'se', 'to']
+    for x in range (0,len(estados)):
+        for y in range (1, len(estados)):
+            if x != y:
+                print(f'{estados[x]} -> {estados[y]}')
+                sent = etapa1(estados[x], estados[y], "atraso", "packet-count-sent", "84600")
+                duplicate = etapa1(estados[x], estados[y], "atraso", "packet-duplicates", "84600")
+                rtt = etapa1(estados[x], estados[y], "atraso", "histogram-rtt", "84600")
+                loss_rate = etapa1(estados[x], estados[y], "atraso", "packet-loss-rate", "84600")
+                sent2 = etapa2(sent, "packet-count-sent")
+                duplicate2 = etapa2(duplicate, "packet-duplicates")
+                rtt2 = etapa2(rtt, "histogram-rtt")
+                loss_rate2 = etapa2(loss_rate, "packet-loss-rate")
+                arrival_rate = arrival(loss_rate2, sent2, duplicate2)
+                waiting_time = waiting(rtt2)
+                service_time = waiting_time/(1+arrival_rate * waiting_time)
+                utilizacao = arrival_rate * service_time
+                packet_number = utilizacao / (1- utilizacao)
+                print(f'waiting_time: {waiting_time}')
+                print(f'arrival: {arrival_rate}')
+                print(f'service_time: {service_time}')
+                print(f'service_rate: {1/service_time}')
+                print(f'utilizacao: {utilizacao}')
+                print(f'packet_number: {packet_number}')
+                plot_histograma(rtt2, estados[x], estados[y],False, True)
+                print('------------------------------------------------------------')
+
  

@@ -41,4 +41,5 @@ packet_number = utilizacao / (1- utilizacao)
 
 #-----------------------------------------------------------------------------------------------------
    
-plot_histograma(rtt2)
+# plot_histograma(rtt2)
+states_2by2()
