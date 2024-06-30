@@ -10,8 +10,10 @@ def etapa1(origem, dst, interface, event, time_range, bw_target_bandwidth=None):
     if bw_target_bandwidth:
         url = f"http://monipe-central.rnp.br/esmond/perfsonar/archive/?source=monipe-{origem}-{interface}.rnp.br&destination=monipe-{dst}-{interface}.rnp.br&event-type={event}&time-range={time_range}&bw-target-bandwidth={bw_target_bandwidth}"
     else: url = f"http://monipe-central.rnp.br/esmond/perfsonar/archive/?source=monipe-{origem}-{interface}.rnp.br&destination=monipe-{dst}-{interface}.rnp.br&event-type={event}&time-range={time_range}"
-
-    return requests.get(url, verify=False).json()[0]['metadata-key']
+    try:
+        return requests.get(url, verify=False).json()[0]['metadata-key']
+    except:
+        return None
 
 def etapa2(uri, interface=""):
     uri = f"http://monipe-central.rnp.br/esmond/perfsonar/archive/{uri}/{interface}/base"
@@ -31,7 +33,7 @@ def arrival(losses, sent, duplicate, time_window=84600):
         sum_duplicate += duplicate[y]["val"]
 
     prob_arrival = 1 - (sum_loss/len(losses))
-    arrival = prob_arrival * (sum_sent-sum_duplicate)/time_window
+    arrival = prob_arrival * (sum_sent - sum_duplicate)/time_window
     return arrival
 
 def waiting(rtt):
@@ -53,7 +55,9 @@ def waiting(rtt):
 
 def plot_histograma_sub_rotina(min_hist, max_hist, histogram_data, divisions):
 
-    bin_edges = np.arange(min_hist , max_hist,  np.floor((max_hist - min_hist) / divisions))
+    step = np.floor((max_hist - min_hist) / divisions)
+    #print(min_hist, max_hist, divisions)
+    bin_edges = np.arange(min_hist , max_hist,  step)
     bin_labels = [f"{bin_edges[i]:.1f} - {bin_edges[i+1]:.1f}" for i in range(len(bin_edges)-1)]
     binned_data = {label: 0 for label in bin_labels}
 
@@ -87,7 +91,8 @@ def plot_histograma(rtt):
     max_hist = max(histogram_data.keys()) - 1
     half_hist = max_hist / 2
 
-    plot_histograma_sub_rotina(half_hist, max_hist, histogram_data, 7)
-    plot_histograma_sub_rotina(min_hist, half_hist, histogram_data, 7)
+    #plot_histograma_sub_rotina(half_hist, max_hist, histogram_data, 5)
+    #plot_histograma_sub_rotina(min_hist, half_hist, histogram_data, 5)
+    plot_histograma_sub_rotina(min_hist, max_hist, histogram_data, 10)
     
  

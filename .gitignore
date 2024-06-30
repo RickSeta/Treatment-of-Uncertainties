@@ -1,0 +1,8 @@
+#Ignora pycache
+*__pycache__*
+
+#Ignora histogramas gerados
+*histogram*
+
+#Ignora csv gerado
+pops_as_queues.csv
